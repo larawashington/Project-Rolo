@@ -1,0 +1,82 @@
+rolo-brain (Project Rolo)
+================================================================
+
+This work distributes a fine-tuned model derived from Google's 
+Gemma 3 4B Instruction-Tuned model for [Project Rolo](https://github.com/larawashington/Desktop-Pet).
+The fine-tune is published as a LoRA delta fused into the base 
+weights and quantized to GGUF (Q5_K_M) for distribution via 
+Ollama.
+
+----------------------------------------------------------------
+Base model
+----------------------------------------------------------------
+
+Component:  google/gemma-3-4b-it (Gemma 3 4B Instruction-Tuned)
+Owner:      Google
+License:    Gemma Terms of Use
+Link:       https://ai.google.dev/gemma/terms
+
+Use of this model is subject to the Gemma Terms of Use including
+the Gemma Prohibited Use Policy
+(https://ai.google.dev/gemma/prohibited_use_policy). Downstream 
+users of `rolo-brain` are bound by those terms as if they had 
+downloaded the base Gemma 3 model directly.
+
+The base weights used for fine-tuning were taken from the MLX
+community 4-bit conversion:
+
+  mlx-community/gemma-3-4b-it-4bit
+  https://huggingface.co/mlx-community/gemma-3-4b-it-4bit
+
+----------------------------------------------------------------
+Fine-tune (LoRA delta)
+----------------------------------------------------------------
+
+Component:  rolo-brain adapter (LoRA delta)
+Author:     Lara Washington
+License:    Apache License 2.0 (delta only; base model retains
+            its own Gemma Terms of Use)
+
+Training method:    LoRA (r=16, scale=2.0), completion-only loss
+Trainer:            mlx-lm 0.31.3
+Seed:               20260515
+Training corpus:    ~3,400 SFT rows, supervised dialogue/speech
+                    matched to a Rust runtime's first-user-turn
+                    contract (see `runtime_contract.md`).
+
+----------------------------------------------------------------
+Training-data provenance
+----------------------------------------------------------------
+
+The supervised fine-tuning corpus was assembled from:
+
+  1. A hand-written gold-seed set authored by Lara Washington.
+  2. A synthetic dialogue corpus distilled from DeepSeek V4-Pro
+     (DeepSeek-AI, MIT-licensed weights with distillation
+     explicitly permitted by the publisher's terms).
+  3. A small mix of databricks-dolly-15k (CC BY-SA 3.0) rows to
+     preserve general instruction-following.
+  4. Quality-filtered by Kimi K2.6 (Moonshot AI, modified MIT)
+     acting as a judge model.
+  5. A small "defense seed" of hand-written boundary-teaching
+     rows authored by Lara Washington.
+
+All training-data sources permit derivative fine-tunes.
+
+----------------------------------------------------------------
+Inference contract
+----------------------------------------------------------------
+
+The model expects a specific first-user-turn layout (state header
++ blank line + user/<idle> body); see the `runtime_contract.md`
+included in this repository. Sending a `system` role to this
+model is OFF-DISTRIBUTION and will degrade output quality —
+persona is in the weights, not in a system prompt.
+
+----------------------------------------------------------------
+Trademarks
+----------------------------------------------------------------
+
+Gemma is a trademark of Google LLC. Ollama is a trademark of
+Ollama, Inc. All other trademarks are the property of their
+respective owners. Use of these names does not imply endorsement.

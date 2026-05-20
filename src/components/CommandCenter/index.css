@@ -1,0 +1,1155 @@
+@import "../../styles/tokens.css";
+
+/*
+ * Rolo Command Center — pixel-art styled CSS.
+ *
+ * The window is frameless and transparent (decorations(false) +
+ * transparent(true) in src-tauri/src/command_center/window.rs). The chrome
+ * is drawn entirely in CSS using the same 9-slice SVG border-image as the
+ * speech bubble and chat window — Rolo's whole UI shares one visual
+ * vocabulary.
+ *
+ * Class names are prefixed `cc-` to avoid collisions with the other window
+ * stylesheets (SpeechBubble, StatusPanel, chat) since the same Vite bundle
+ * is loaded into every window.
+ *
+ * Typography:
+ *   - Pixel-art surfaces (header, tab buttons, labels, primary buttons):
+ *     "Press Start 2P" at 8–10px
+ *   - Body text and form inputs: Monaco / system monospace at 12–13px
+ */
+
+/* --- Transparent foundation ------------------------------------------- */
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  /* App.css sets pointer-events: none on html/body/#root for the
+     transparent main pet window. That CSS leaks into this window via the
+     shared JS bundle — restore hit-testing here. */
+  pointer-events: auto !important;
+}
+
+body {
+  font-family: Monaco, "Courier New", monospace;
+  color: #1a1a1a;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Frame — main container with the 9-slice pixel border --- */
+
+.cc-frame {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  margin: 5px;
+  box-sizing: border-box;
+  image-rendering: pixelated;
+  border: 6px solid transparent;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='21' height='21' fill='none' shape-rendering='crispEdges'><rect x='6' y='0' width='9' height='3' fill='black'/><rect x='0' y='6' width='3' height='9' fill='black'/><rect x='18' y='6' width='3' height='9' fill='black'/><rect x='6' y='18' width='9' height='3' fill='black'/><rect x='3' y='3' width='3' height='3' fill='black'/><rect x='15' y='3' width='3' height='3' fill='black'/><rect x='3' y='15' width='3' height='3' fill='black'/><rect x='15' y='15' width='3' height='3' fill='black'/><rect x='6' y='3' width='9' height='3' fill='white'/><rect x='3' y='6' width='15' height='9' fill='white'/><rect x='6' y='15' width='9' height='3' fill='white'/></svg>");
+  border-image-slice: 6 fill;
+  border-image-width: 6px;
+  background: none;
+  overflow: hidden;
+  position: relative;
+}
+
+/* --- Custom titlebar ------------------------------------------------- */
+
+.cc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  min-height: 26px;
+  padding: 0 8px;
+  background: #2a2a2a;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+
+.cc-header-title {
+  flex: 1 1 auto;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Pad-left so the title visually centers despite the right-side controls. */
+  padding-left: 56px;
+}
+
+.cc-header-controls {
+  display: flex;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+.cc-header-min,
+.cc-header-close {
+  -webkit-app-region: no-drag;
+  background: none;
+  border: none;
+  color: #999999;
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cc-header-min:hover {
+  color: #ffcc66;
+}
+
+.cc-header-close:hover {
+  color: #ff6666;
+}
+
+/* --- Body: sidebar + content pane ----------------------------------- */
+
+.cc-body {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: #ffffff;
+}
+
+.cc-loading {
+  align-items: center;
+  justify-content: center;
+}
+
+.cc-loading-label {
+  color: #888888;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+}
+
+/* --- Sidebar --- */
+
+.cc-sidebar {
+  width: 160px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-right: 2px solid #c0c0c0;
+  padding: 8px 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.cc-tab-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cc-tab-list-item {
+  margin: 0;
+  padding: 0;
+}
+
+.cc-tab-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  color: var(--rolo-text);
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.cc-tab-button:hover:not(:disabled) {
+  background: #e5e5e5;
+  color: var(--rolo-text);
+}
+
+.cc-tab-button:focus {
+  outline: none;
+  background: #e5e5e5;
+  color: var(--rolo-text);
+}
+
+.cc-tab-button-active,
+.cc-tab-button-active:hover,
+.cc-tab-button-active:focus {
+  background: #2a2a2a;
+  color: #ffffff;
+}
+
+.cc-tab-button-disabled,
+.cc-tab-button-disabled:hover,
+.cc-tab-button-disabled:focus {
+  background: transparent;
+  color: var(--rolo-text);
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* --- Content pane --- */
+
+.cc-content {
+  flex: 1 1 auto;
+  background: #ffffff;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 13px;
+  color: #1a1a1a;
+}
+
+/* Pixel-art scrollbars (mirror chat.css). */
+.cc-content::-webkit-scrollbar,
+.cc-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+.cc-content::-webkit-scrollbar-track,
+.cc-sidebar::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+.cc-content::-webkit-scrollbar-thumb,
+.cc-sidebar::-webkit-scrollbar-thumb {
+  background: #888888;
+  border: 1px solid #666666;
+}
+.cc-content::-webkit-scrollbar-thumb:hover,
+.cc-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #666666;
+}
+
+.cc-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cc-tab-title {
+  margin: 0 0 4px 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 14px;
+  color: #1a1a1a;
+  text-transform: uppercase;
+}
+
+.cc-tab-placeholder {
+  margin: 0;
+  color: #888888;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ----------------------------------------------------------------------
+ * Forms — labels, inputs, selects, textareas
+ * Pixel-friendly: small Press Start 2P labels above stretchy inputs.
+ * -------------------------------------------------------------------- */
+
+.cc-form-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.cc-form-label {
+  width: 120px;
+  flex-shrink: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  color: var(--rolo-text);
+  text-transform: uppercase;
+}
+
+.cc-form-input,
+.cc-form-select {
+  flex: 1 1 auto;
+  padding: 6px 8px;
+  background: #ffffff;
+  border: 2px solid #aaaaaa;
+  border-radius: 2px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.cc-form-input::placeholder {
+  color: #aaaaaa;
+  font-style: italic;
+}
+
+.cc-form-input:focus,
+.cc-form-select:focus {
+  border-color: var(--rolo-green);
+  box-shadow: 0 0 0 1px rgba(90, 138, 90, 0.25);
+}
+
+.cc-form-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+/* --- Buttons --- */
+
+.cc-button {
+  padding: 6px 12px;
+  border: 1px solid #888888;
+  border-radius: 2px;
+  background: #aaaaaa;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  cursor: pointer;
+  min-height: 28px;
+  transition: background-color 0.1s ease;
+}
+
+.cc-button:hover:not(:disabled) {
+  background: #999999;
+}
+
+.cc-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cc-button-primary {
+  background: var(--rolo-green);
+  border: 1px solid #2a4a2a;
+  color: #ffffff;
+}
+
+.cc-button-primary:hover:not(:disabled) {
+  background: var(--rolo-green-hover);
+}
+
+.cc-button-primary:active:not(:disabled) {
+  background: #4a7a4a;
+}
+
+.cc-button-primary:disabled {
+  background: #aaaaaa;
+  border-color: #888888;
+  color: #ffffff;
+}
+
+.cc-button-secondary {
+  background: #aaaaaa;
+  border: 1px solid #888888;
+  color: #ffffff;
+}
+
+.cc-button-secondary:hover:not(:disabled) {
+  background: #999999;
+}
+
+.cc-button-test {
+  background: #3d6084;
+  border: 1px solid #21385a;
+  color: #ffffff;
+}
+
+.cc-button-test:hover:not(:disabled) {
+  background: #4d7aa4;
+}
+
+.cc-button-test:active:not(:disabled) {
+  background: #2f4a6a;
+}
+
+.cc-button-test:disabled {
+  background: #aaaaaa;
+  border-color: #888888;
+  color: #ffffff;
+}
+
+.cc-button-danger {
+  background: var(--rolo-red);
+  border: 1px solid #802a2a;
+  color: #ffffff;
+}
+
+.cc-button-danger:hover:not(:disabled) {
+  background: #cc5a5a;
+}
+
+.cc-button-wide {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+/* --- Refresh button (Perception) --- */
+
+.cc-refresh-button {
+  padding: 6px 10px;
+  background: #aaaaaa;
+  border: 1px solid #888888;
+  border-radius: 2px;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cc-refresh-button:hover:not(:disabled) {
+  background: #999999;
+}
+
+.cc-refresh-button:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+/* --- Status / test rows --- */
+
+.cc-test-status-row {
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.cc-test-status-ok {
+  color: #2a6a2a;
+  font-weight: 600;
+}
+
+.cc-test-status-fail {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.cc-test-status-pending {
+  color: #888888;
+}
+
+/* --- Tool routing / idle-speech notices --- */
+
+.cc-tool-notice {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  padding: 4px 0;
+  font-style: italic;
+}
+
+.cc-tool-notice-neutral {
+  color: #888888;
+}
+
+.cc-tool-notice-amber {
+  color: #a06000;
+}
+
+/* --- Banners (success / amber / red) --- */
+
+.cc-success-banner,
+.cc-banner {
+  padding: 10px 12px;
+  border-radius: 2px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  border: 2px solid;
+  transition: opacity 200ms ease-out;
+}
+
+.cc-success-banner,
+.cc-banner-success {
+  background: #e6f5e6;
+  border-color: #2a6a2a;
+  color: #2a6a2a;
+}
+
+.cc-banner-amber {
+  background: #fff4d6;
+  border-color: #a06000;
+  color: #8a5000;
+}
+
+.cc-banner-red {
+  background: #fbe0e0;
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
+.cc-error-banner {
+  padding: 10px 12px;
+  border-radius: 2px;
+  background: #fbe0e0;
+  border: 2px solid #b91c1c;
+  color: #b91c1c;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* --- Setup-mode banner --- */
+
+.cc-setup-banner {
+  padding: 10px 12px;
+  border-radius: 2px;
+  background: #fff4d6;
+  border: 2px solid #a06000;
+  color: #8a5000;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* ----------------------------------------------------------------------
+ * Perception tab — probe rows
+ * -------------------------------------------------------------------- */
+
+.cc-perception-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cc-probe-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cc-probe-row {
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.cc-probe-row:hover {
+  background: #f8f8f8;
+}
+
+.cc-probe-row-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  padding: 8px 10px;
+  margin: 0;
+  background: transparent;
+  border: none;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #1a1a1a;
+  cursor: pointer;
+  text-align: left;
+  gap: 10px;
+}
+
+.cc-probe-row-button:focus {
+  outline: 2px solid var(--rolo-green);
+  outline-offset: -2px;
+}
+
+/* Status indicator — pixel squares, not circles. */
+.cc-probe-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  background: #aaaaaa;
+  image-rendering: pixelated;
+}
+
+.cc-probe-dot-green {
+  background: var(--rolo-bar-green);
+}
+.cc-probe-dot-amber {
+  background: var(--rolo-bar-yellow);
+}
+.cc-probe-dot-red {
+  background: var(--rolo-bar-red);
+}
+.cc-probe-dot-grey {
+  background: #aaaaaa;
+}
+
+.cc-probe-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  color: #1a1a1a;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.cc-probe-message {
+  color: #555555;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+}
+
+.cc-probe-latency {
+  color: #888888;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.cc-probe-chevron {
+  color: #888888;
+  flex-shrink: 0;
+  transition: transform 100ms ease-out;
+}
+
+.cc-probe-chevron-open {
+  transform: rotate(90deg);
+}
+
+.cc-probe-detail {
+  padding: 4px 10px 12px 34px;
+  color: #555555;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ----------------------------------------------------------------------
+ * Memory tab — textareas, counters, learned echo block
+ * -------------------------------------------------------------------- */
+
+.cc-tab-memory {
+  position: relative;
+}
+
+.cc-memory-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cc-memory-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cc-memory-section-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  color: var(--rolo-text);
+  text-transform: uppercase;
+}
+
+.cc-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  background: #ffffff;
+  border: 2px solid #aaaaaa;
+  border-radius: 2px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #1a1a1a;
+  line-height: 1.45;
+  resize: vertical;
+  min-height: 72px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.cc-textarea:focus {
+  border-color: var(--rolo-green);
+  box-shadow: 0 0 0 1px rgba(90, 138, 90, 0.25);
+}
+
+.cc-textarea:disabled {
+  background: #f4f4f4;
+  color: #888888;
+}
+
+.cc-counter {
+  align-self: flex-end;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 10px;
+  color: #888888;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-counter-amber {
+  color: #a06000;
+}
+
+.cc-counter-red {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+/* --- Collapsible "What Rolo has learned" --- */
+
+.cc-collapsible {
+  margin-top: 20px;
+  border-top: 2px solid #cccccc;
+  padding-top: 14px;
+}
+
+.cc-collapsible-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  color: var(--rolo-text);
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.cc-collapsible-toggle:focus {
+  outline: 2px solid var(--rolo-green);
+  outline-offset: 2px;
+}
+
+.cc-collapsible-caret {
+  display: inline-block;
+  color: #888888;
+  font-size: 14px;
+  width: 12px;
+  transition: transform 100ms ease-out;
+}
+
+.cc-collapsible-caret-open {
+  transform: rotate(90deg);
+}
+
+.cc-collapsible-body {
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cc-setup-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding-left: 20px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: var(--rolo-text);
+}
+
+.cc-setup-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cc-setup-step-title {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cc-setup-step-note {
+  color: #555555;
+  line-height: 1.45;
+}
+
+.cc-setup-code {
+  margin: 0;
+  padding: 8px 10px;
+  background: #f4f4f4;
+  border: 1px solid #cccccc;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  user-select: text;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Rolo Brain first-run pull wizard */
+.cc-collapsible-promoted {
+  border: 1px solid #333333;
+  padding: 12px;
+  background: #fafafa;
+}
+.cc-step-checkmark {
+  color: #2a8b3a;
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  margin-left: 6px;
+}
+.cc-pull-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.cc-pull-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.cc-pull-progress-bar {
+  height: 10px;
+  border: 1px solid #333333;
+  background: #ffffff;
+  overflow: hidden;
+}
+.cc-pull-progress-bar-fill {
+  height: 100%;
+  background: #2a8b3a;
+  transition: width 200ms linear;
+}
+.cc-pull-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 11px;
+  color: #333333;
+}
+.cc-pull-waiting {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+.cc-pull-error {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+.cc-pull-manual summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: #555555;
+}
+.cc-pull-manual summary:hover {
+  color: #000000;
+}
+
+.cc-learned-echo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cc-echo-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cc-echo-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  color: #555555;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cc-echo-text {
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #1a1a1a;
+  white-space: pre-wrap;
+  background: #f8f8f8;
+  border: 1px solid #cccccc;
+  border-radius: 2px;
+  padding: 6px 8px;
+}
+
+.cc-learned-empty {
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #888888;
+  margin: 0;
+}
+
+.cc-learned-titles-header {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  color: var(--rolo-text);
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+}
+
+.cc-learned-titles-list {
+  margin: 0;
+  padding-left: 18px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #1a1a1a;
+}
+
+.cc-learned-confirm {
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #b91c1c;
+  flex: 1 1 auto;
+}
+
+/* ----------------------------------------------------------------------
+ * SleepOverlay — scoped to the Memory panel
+ * -------------------------------------------------------------------- */
+
+.cc-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 10;
+}
+
+.cc-overlay-card {
+  /* Reuse the same 9-slice border-image as .cc-frame so the modal feels
+     like a smaller Rolo window dropped on top. */
+  border: 6px solid transparent;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='21' height='21' fill='none' shape-rendering='crispEdges'><rect x='6' y='0' width='9' height='3' fill='black'/><rect x='0' y='6' width='3' height='9' fill='black'/><rect x='18' y='6' width='3' height='9' fill='black'/><rect x='6' y='18' width='9' height='3' fill='black'/><rect x='3' y='3' width='3' height='3' fill='black'/><rect x='15' y='3' width='3' height='3' fill='black'/><rect x='3' y='15' width='3' height='3' fill='black'/><rect x='15' y='15' width='3' height='3' fill='black'/><rect x='6' y='3' width='9' height='3' fill='white'/><rect x='3' y='6' width='15' height='9' fill='white'/><rect x='6' y='15' width='9' height='3' fill='white'/></svg>");
+  border-image-slice: 6 fill;
+  border-image-width: 6px;
+  image-rendering: pixelated;
+  padding: 18px 22px;
+  min-width: 280px;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.cc-overlay-title {
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+.cc-overlay-stage {
+  margin: 0;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #555555;
+}
+
+.cc-overlay-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+/* ----------------------------------------------------------------------
+ * Weather tab — radio/checkbox rows, helpers, status banner
+ * -------------------------------------------------------------------- */
+
+.cc-radio-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.cc-radio-option,
+.cc-checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: #1a1a1a;
+  cursor: pointer;
+  width: auto;
+}
+
+.cc-radio-option input[type="radio"],
+.cc-checkbox-option input[type="checkbox"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.cc-form-row-inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.cc-form-input-narrow {
+  max-width: 160px;
+}
+
+.cc-form-helper {
+  margin: 4px 0 0;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 11px;
+  color: #666666;
+}
+
+.cc-form-helper-muted {
+  font-style: italic;
+}
+
+.cc-form-helper code {
+  background: #f0f0f0;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 11px;
+  color: #1a1a1a;
+}
+
+.cc-form-error {
+  margin: 4px 0 0;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 11px;
+  color: #b91c1c;
+}
+
+.cc-weather-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  border-radius: 2px;
+  background: #f4f4f4;
+  border: 2px solid #aaaaaa;
+}
+
+.cc-weather-status-green {
+  background: #e6f5e6;
+  border-color: #2a6a2a;
+}
+
+.cc-weather-status-amber {
+  background: #fff4d6;
+  border-color: #a06000;
+}
+
+.cc-weather-status-red {
+  background: #fbe0e0;
+  border-color: #b91c1c;
+}
+
+.cc-weather-status-label {
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  color: var(--rolo-text);
+}
+
+/* Status indicator — pixel squares (not circles) for the weather banner. */
+.cc-status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+.cc-status-dot-green {
+  background: #3a8a3a;
+}
+.cc-status-dot-amber {
+  background: #d68a00;
+}
+.cc-status-dot-red {
+  background: #b91c1c;
+}
+.cc-status-dot-grey {
+  background: #aaaaaa;
+}
+
+/* ----------------------------------------------------------------------
+ * Modal overlays — discard prompt + setup-gate notice
+ *
+ * The backdrop covers the entire .cc-frame so the modal sits above the
+ * sidebar AND the content pane (unlike SleepOverlay which scopes itself
+ * to the Memory panel). The card reuses the 9-slice border so it looks
+ * like a child Rolo window.
+ * -------------------------------------------------------------------- */
+
+.cc-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 100;
+}
+
+.cc-modal-card {
+  border: 6px solid transparent;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='21' height='21' fill='none' shape-rendering='crispEdges'><rect x='6' y='0' width='9' height='3' fill='black'/><rect x='0' y='6' width='3' height='9' fill='black'/><rect x='18' y='6' width='3' height='9' fill='black'/><rect x='6' y='18' width='9' height='3' fill='black'/><rect x='3' y='3' width='3' height='3' fill='black'/><rect x='15' y='3' width='3' height='3' fill='black'/><rect x='3' y='15' width='3' height='3' fill='black'/><rect x='15' y='15' width='3' height='3' fill='black'/><rect x='6' y='3' width='9' height='3' fill='white'/><rect x='3' y='6' width='15' height='9' fill='white'/><rect x='6' y='15' width='9' height='3' fill='white'/></svg>");
+  border-image-slice: 6 fill;
+  border-image-width: 6px;
+  image-rendering: pixelated;
+  padding: 18px 22px;
+  min-width: 300px;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cc-modal-title {
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 11px;
+  color: #1a1a1a;
+  text-transform: uppercase;
+}
+
+.cc-modal-body {
+  margin: 0;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--rolo-text);
+}
+
+.cc-modal-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}

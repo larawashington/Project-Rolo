@@ -1,0 +1,221 @@
+@import "./styles/tokens.css";
+
+/*
+ * Rolo's visual foundation — oversized 320x320 window.
+ *
+ * The window is larger than Rolo's 128x128 sprite to accommodate
+ * the confirmation bubble above him. The pointer-events hierarchy is critical:
+ *
+ * - html/body/#root: pointer-events: none -> transparent areas pass clicks through
+ * - .pet-container: pointer-events: auto -> Rolo himself is interactive
+ * - .bubble-content: pointer-events: auto -> bubble buttons are clickable
+ * - Everything else inherits none -> clicks pass through to desktop
+ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+  width: 320px;
+  height: 320px;
+  pointer-events: none;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  width: 320px;
+  height: 320px;
+  pointer-events: none;
+}
+
+.rolo-world {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  pointer-events: none;
+}
+
+.pet-container {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 128px;
+  height: 128px;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.rolo-world.top-anchored .pet-container {
+  bottom: auto;
+  top: 0;
+}
+
+.pet-sprite {
+  width: 128px;
+  height: 128px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  /* Rust cursor polling handles hover + drag via CoreGraphics */
+  pointer-events: auto;
+  /* Transparent background — Rolo floats on the desktop */
+  background: transparent;
+}
+
+/* --- Confirmation Bubble --- */
+
+.bubble-container {
+  position: absolute;
+  bottom: 136px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rolo-world.top-anchored .bubble-container {
+  bottom: auto;
+  top: 136px;
+}
+
+.bubble-content {
+  pointer-events: auto;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 11px;
+  color: #000000;
+  white-space: pre-line;
+  position: relative;
+  min-width: 120px;
+  max-width: 240px;
+  text-align: center;
+}
+
+/* --- Shared pixel-art tail --------------------------------------------------
+ *
+ * Used by both `.bubble-tail` (InteractiveBubble, 2px unit) and `.speech-tail`
+ * (SpeechBubble, 3px unit). Each "pixel" is `--unit` wide; the grid steps are
+ * `calc(N * var(--unit))` so the shape scales pixel-perfectly between units.
+ *
+ * Defaults: `--unit: 2px`, `--fill: #ffffff` (matches InteractiveBubble).
+ * Override `--unit` / `--fill` on the consumer class to retarget.
+ *
+ *   Gap row (y=0): F F . F F   (whites that erase the bubble's bottom border)
+ *   Row 1  (y=1u): B F F F B   (outlined step)
+ *   Row 2  (y=2u):   B F B     (narrower)
+ *   Row 3  (y=3u):     B       (tip)
+ */
+.pixel-tail {
+  pointer-events: none;
+  position: relative;
+  width: var(--unit, 2px);
+  height: var(--unit, 2px);
+  margin: calc(-1 * var(--unit, 2px)) auto 0 auto;
+  background: var(--fill, #ffffff);
+  flex-shrink: 0;
+  z-index: 1;
+  box-shadow:
+    /* Gap row — erases the bubble's bottom border at the tail opening. */
+    calc(-2 * var(--unit, 2px)) 0 0 0 var(--fill, #ffffff),
+    calc(-1 * var(--unit, 2px)) 0 0 0 var(--fill, #ffffff),
+    calc( 1 * var(--unit, 2px)) 0 0 0 var(--fill, #ffffff),
+    calc( 2 * var(--unit, 2px)) 0 0 0 var(--fill, #ffffff),
+    /* Row 1 — widest outlined step */
+    calc(-2 * var(--unit, 2px)) calc(1 * var(--unit, 2px)) 0 0 #000000,
+    calc(-1 * var(--unit, 2px)) calc(1 * var(--unit, 2px)) 0 0 var(--fill, #ffffff),
+    0                            calc(1 * var(--unit, 2px)) 0 0 var(--fill, #ffffff),
+    calc( 1 * var(--unit, 2px)) calc(1 * var(--unit, 2px)) 0 0 var(--fill, #ffffff),
+    calc( 2 * var(--unit, 2px)) calc(1 * var(--unit, 2px)) 0 0 #000000,
+    /* Row 2 — narrower */
+    calc(-1 * var(--unit, 2px)) calc(2 * var(--unit, 2px)) 0 0 #000000,
+    0                            calc(2 * var(--unit, 2px)) 0 0 var(--fill, #ffffff),
+    calc( 1 * var(--unit, 2px)) calc(2 * var(--unit, 2px)) 0 0 #000000,
+    /* Row 3 — tip */
+    0                            calc(3 * var(--unit, 2px)) 0 0 #000000;
+}
+
+/* Flipped state — tail points up. Consumers add `.pixel-tail-flipped` (or
+ * use the parent-state selector below for the existing InteractiveBubble
+ * top-anchored flip). */
+.pixel-tail-flipped {
+  order: -1;
+  transform: scaleY(-1);
+  margin: 0 auto calc(-1 * var(--unit, 2px)) auto;
+}
+
+/*
+ * `.bubble-tail` itself inherits all geometry from `.pixel-tail` — defaults
+ * (--unit: 2px, --fill: #fff) match InteractiveBubble's needs exactly, so no
+ * overrides are required.
+ */
+
+.rolo-world.top-anchored .bubble-tail {
+  order: -1;
+  transform: scaleY(-1);
+  margin: 0 auto calc(-1 * var(--unit, 2px)) auto;
+}
+
+.bubble-prompt {
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.bubble-file {
+  font-size: 10px;
+  color: var(--rolo-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bubble-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-yum {
+  pointer-events: auto;
+  background: var(--rolo-green);
+  border: 1px solid #2a4a2a;
+  color: #ffffff;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.btn-yum:hover {
+  background: var(--rolo-green-hover);
+}
+
+.btn-nah {
+  pointer-events: auto;
+  background: #8a4a3a;
+  border: 1px solid #4a2a1a;
+  color: #ffffff;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.btn-nah:hover {
+  background: #aa5a4a;
+}

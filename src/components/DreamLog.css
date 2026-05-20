@@ -1,0 +1,139 @@
+/*
+ * Dream Log panel — keeps the pixel-art look of StatusPanel.css while
+ * adding scrolling, per-run cards, and a [revert] action per fact.
+ */
+
+.dreamlog-panel {
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  line-height: 1.5;
+  color: #000000;
+  text-transform: uppercase;
+  padding: 4px 2px;
+  /* Status-panel window is 200px tall; tabs + padding consume ~36px. Cap
+     the scroller below that so the [revert] buttons stay reachable
+     instead of bleeding past the bottom edge. */
+  max-height: 150px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.dreamlog-empty,
+.dreamlog-error {
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  line-height: 1.6;
+  text-transform: uppercase;
+  padding: 16px 8px;
+  text-align: center;
+  color: #000000;
+}
+
+.dreamlog-error {
+  color: #d05c4f;
+}
+
+.dreamlog-run {
+  border-left: 2px solid #5fb56b;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 4px 6px;
+  margin-bottom: 6px;
+}
+
+.dreamlog-failed,
+.dreamlog-cancelled,
+.dreamlog-skipped {
+  border-left-color: #d05c4f;
+}
+
+.dreamlog-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 6px;
+  margin-bottom: 2px;
+  color: #2d5a8c;
+}
+
+.dreamlog-time {
+  font-weight: bold;
+}
+
+.dreamlog-status {
+  margin-left: auto;
+}
+
+.dreamlog-latency {
+  color: #555;
+}
+
+.dreamlog-meta {
+  font-size: 6px;
+  margin-bottom: 3px;
+}
+
+.dreamlog-facts {
+  list-style: none;
+  padding: 0;
+  margin: 2px 0 0 0;
+}
+
+.dreamlog-facts li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 2px 0;
+  border-top: 1px dotted rgba(0, 0, 0, 0.15);
+  font-size: 6px;
+  text-transform: none;
+}
+
+.dreamlog-facts li:first-child {
+  border-top: none;
+}
+
+.dreamlog-fact-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dreamlog-fact-file {
+  color: #2d5a8c;
+  font-size: 6px;
+  text-transform: lowercase;
+}
+
+.dreamlog-fact-content {
+  color: #000000;
+  font-size: 6px;
+  word-break: break-word;
+  text-transform: none;
+}
+
+.dreamlog-revert {
+  font-family: "Press Start 2P", monospace;
+  font-size: 6px;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid #000000;
+  color: #000000;
+  padding: 1px 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+.dreamlog-revert:hover {
+  background: #d05c4f;
+  border-color: #d05c4f;
+  color: #ffffff;
+}
+
+.dreamlog-reason {
+  color: #d05c4f;
+  font-size: 6px;
+  margin-top: 2px;
+}

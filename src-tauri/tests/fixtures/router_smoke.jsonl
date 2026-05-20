@@ -1,0 +1,13 @@
+{"input": "the conclusion about the new hire from last quarter", "expected_action": "tool", "expected_tool": "search_vault"}
+{"input": "the project status from yesterday's standup", "expected_action": "tool", "expected_tool": "search_vault"}
+{"input": "tell me about that conversation we had on the train", "expected_action": "tool", "expected_tool": "search_vault"}
+{"input": "I forget — when did the migration ship", "expected_action": "tool", "expected_tool": "search_vault"}
+{"input": "did I mention anything about the dentist appointment", "expected_action": "tool", "expected_tool": "search_vault"}
+{"input": "are you tired right now", "expected_action": "tool", "expected_tool": "get_mood_state"}
+{"input": "are you hungry", "expected_action": "tool", "expected_tool": "get_mood_state"}
+{"input": "feeling lonely buddy", "expected_action": "tool", "expected_tool": "get_mood_state"}
+{"input": "what's your battery situation", "expected_action": "tool", "expected_tool": "get_pet_state"}
+{"input": "where on the screen are you sitting", "expected_action": "tool", "expected_tool": "get_pet_state"}
+{"input": "give me a pep talk", "expected_action": "speak"}
+{"input": "tell me a joke about cats", "expected_action": "speak"}
+{"input": "I'm bored, entertain me", "expected_action": "speak"}

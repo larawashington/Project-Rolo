@@ -1,0 +1,30 @@
+# morning_content
+speech:  [Mood: content | Energy: high | Social: ok | Time: 9:00 AM]
+router:  [Rolo: Mood: content | Energy: high | Social: ok | State: Idle | Time: 9:00 AM]
+compact: Mood: content; Energy: high; Social: ok; State: Idle; Time: 9:00 AM
+
+# afternoon_content
+speech:  [Mood: neutral | Energy: medium | Social: ok | Time: 2:00 PM]
+router:  [Rolo: Mood: neutral | Energy: medium | Social: ok | State: Idle | Time: 2:00 PM]
+compact: Mood: neutral; Energy: medium; Social: ok; State: Idle; Time: 2:00 PM
+
+# late_night_content
+speech:  [Mood: neutral | Energy: low | Social: ok | Time: 1:30 AM]
+router:  [Rolo: Mood: neutral | Energy: low | Social: ok | State: Idle | Time: 1:30 AM]
+compact: Mood: neutral; Energy: low; Social: ok; State: Idle; Time: 1:30 AM
+
+# morning_anxious
+speech:  [Mood: sad (snarky) | Energy: low | Social: lonely | Time: 9:00 AM | Hunger: peckish]
+router:  [Rolo: Mood: sad (snarky) | Energy: low | Social: lonely | State: Idle | Time: 9:00 AM | Hunger: peckish]
+compact: Mood: sad; Energy: low; Social: lonely; State: Idle; Time: 9:00 AM; Sass: snarky; Hunger: peckish
+
+# afternoon_anxious
+speech:  [Mood: sad (snarky) | Energy: low | Social: lonely | Time: 2:00 PM | Hunger: peckish]
+router:  [Rolo: Mood: sad (snarky) | Energy: low | Social: lonely | State: Idle | Time: 2:00 PM | Hunger: peckish]
+compact: Mood: sad; Energy: low; Social: lonely; State: Idle; Time: 2:00 PM; Sass: snarky; Hunger: peckish
+
+# late_night_anxious
+speech:  [Mood: sad (snarky) | Energy: low | Social: lonely | Time: 1:30 AM | Hunger: peckish]
+router:  [Rolo: Mood: sad (snarky) | Energy: low | Social: lonely | State: Idle | Time: 1:30 AM | Hunger: peckish]
+compact: Mood: sad; Energy: low; Social: lonely; State: Idle; Time: 1:30 AM; Sass: snarky; Hunger: peckish
+

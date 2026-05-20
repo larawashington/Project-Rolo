@@ -1,0 +1,420 @@
+/*
+ * Rolo's Chat Window — pixel-art styled CSS.
+ *
+ * The chat runs in a separate transparent Tauri window (350x500 logical).
+ * The frame is drawn entirely with CSS using the same SVG border-image
+ * 9-slice technique as SpeechBubble.css.
+ *
+ * Typography:
+ *   - Header/labels: "Press Start 2P" at 8px (pixel-art feel)
+ *   - Message body: system monospace at 12px (readable at length)
+ *
+ * The Google Fonts CDN import for "Press Start 2P" is already in index.html
+ * and allowed by the CSP in tauri.conf.json.
+ */
+
+/* --- Transparent foundation --- */
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  /* App.css sets pointer-events: none on html/body/#root for the
+     transparent main pet window. That CSS leaks into this window via
+     the shared JS bundle — restore hit-testing here. */
+  pointer-events: auto !important;
+}
+
+/* --- Chat frame — the main container --- */
+
+.chat-frame {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  margin: 5px;
+  box-sizing: border-box;
+  image-rendering: pixelated;
+  /* Pixel-art border via 9-slice SVG border-image — same pattern as SpeechBubble */
+  border: 6px solid transparent;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='21' height='21' fill='none' shape-rendering='crispEdges'><rect x='6' y='0' width='9' height='3' fill='black'/><rect x='0' y='6' width='3' height='9' fill='black'/><rect x='18' y='6' width='3' height='9' fill='black'/><rect x='6' y='18' width='9' height='3' fill='black'/><rect x='3' y='3' width='3' height='3' fill='black'/><rect x='15' y='3' width='3' height='3' fill='black'/><rect x='3' y='15' width='3' height='3' fill='black'/><rect x='15' y='15' width='3' height='3' fill='black'/><rect x='6' y='3' width='9' height='3' fill='white'/><rect x='3' y='6' width='15' height='9' fill='white'/><rect x='6' y='15' width='9' height='3' fill='white'/></svg>");
+  border-image-slice: 6 fill;
+  border-image-width: 6px;
+  background: none;
+  overflow: hidden;
+  position: relative;
+}
+
+/* --- Header bar --- */
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 24px;
+  min-height: 24px;
+  padding: 0 8px;
+  background: #2a2a2a;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Allow dragging the window by the header */
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+
+.chat-header-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-header-controls {
+  display: flex;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+}
+
+.chat-header-min {
+  -webkit-app-region: no-drag;
+  background: none;
+  border: none;
+  color: #999999;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.chat-header-min:hover {
+  color: #ffcc66;
+}
+
+.chat-header-close {
+  -webkit-app-region: no-drag;
+  background: none;
+  border: none;
+  color: #999999;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.chat-header-close:hover {
+  color: #ff6666;
+}
+
+/* --- Message list (scrollable) --- */
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Custom pixel-art scrollbar */
+.chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #888888;
+  border: 1px solid #666666;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #666666;
+}
+
+/* --- Message bubbles --- */
+
+.chat-message {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+  animation: chat-msg-in 0.15s ease-out;
+}
+
+@keyframes chat-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Assistant (Rolo) messages — left-aligned */
+.chat-message.assistant {
+  align-self: flex-start;
+}
+
+.chat-message.assistant .chat-message-bubble {
+  background: #f0f0f0;
+  border: 1px solid #cccccc;
+  border-radius: 4px 4px 4px 0;
+}
+
+/* User messages — right-aligned */
+.chat-message.user {
+  align-self: flex-end;
+}
+
+.chat-message.user .chat-message-bubble {
+  background: #d4e8ff;
+  border: 1px solid #a0c4e8;
+  border-radius: 4px 4px 0 4px;
+}
+
+/* System messages — centered, subtle */
+.chat-message.system {
+  align-self: center;
+  max-width: 90%;
+}
+
+.chat-message.system .chat-message-bubble {
+  background: transparent;
+  border: none;
+  text-align: center;
+  font-style: italic;
+  color: #999999;
+  font-size: 10px;
+  padding: 2px 4px;
+}
+
+/* Message bubble body */
+.chat-message-bubble {
+  padding: 6px 8px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #1a1a1a;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  position: relative;
+}
+
+/* Report flag — visible on hover for assistant messages only */
+.chat-message-report {
+  display: none;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: none;
+  border: none;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 1px 3px;
+  line-height: 1;
+  opacity: 0.4;
+  color: #666666;
+}
+
+.chat-message-report:hover {
+  opacity: 1.0;
+  color: #cc0000;
+}
+
+.chat-message.assistant:hover .chat-message-report {
+  display: block;
+}
+
+.chat-message-report.reported {
+  display: block;
+  opacity: 0.6;
+  color: #cc0000;
+  cursor: default;
+}
+
+/* --- Typing indicator --- */
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  align-self: flex-start;
+  background: #f0f0f0;
+  border: 1px solid #cccccc;
+  border-radius: 4px 4px 4px 0;
+}
+
+.typing-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: #888888;
+  image-rendering: pixelated;
+}
+
+/* Sequential bounce animation using CSS steps */
+.typing-dot:nth-child(1) {
+  animation: typing-bounce 1.2s steps(1) infinite;
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation: typing-bounce 1.2s steps(1) infinite;
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation: typing-bounce 1.2s steps(1) infinite;
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+  0%, 40%, 100% {
+    transform: translateY(0);
+    background: #888888;
+  }
+  20% {
+    transform: translateY(-4px);
+    background: #444444;
+  }
+}
+
+/* --- Input area --- */
+
+.chat-input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 6px 8px;
+  background: #f8f8f8;
+  border-top: 1px solid #cccccc;
+  flex-shrink: 0;
+}
+
+.chat-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #1a1a1a;
+  background: #ffffff;
+  /* Pixel-art border matching the overall theme */
+  border: 2px solid #aaaaaa;
+  border-radius: 2px;
+  padding: 5px 6px;
+  resize: none;
+  overflow-y: auto;
+  outline: none;
+  min-height: 32px;
+  max-height: 80px;
+}
+
+.chat-input::placeholder {
+  color: #aaaaaa;
+  font-style: italic;
+}
+
+.chat-input:focus {
+  border-color: #5a8a5a;
+  box-shadow: 0 0 0 1px #5a8a5a40;
+}
+
+.chat-input:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Character count — only visible when approaching the limit */
+.chat-input-char-count {
+  position: absolute;
+  bottom: 3px;
+  right: 6px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 9px;
+  color: #bbbbbb;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.chat-input-char-count.warning {
+  color: #cc6600;
+}
+
+.chat-input-char-count.danger {
+  color: #cc0000;
+}
+
+/* Send button */
+.chat-send-btn {
+  background: #5a8a5a;
+  border: 1px solid #2a4a2a;
+  color: #ffffff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 6px 8px;
+  min-height: 32px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.1s ease;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  background: #6aaa6a;
+}
+
+.chat-send-btn:active:not(:disabled) {
+  background: #4a7a4a;
+}
+
+.chat-send-btn:disabled {
+  background: #aaaaaa;
+  border-color: #888888;
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* --- Empty state --- */
+
+.chat-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaaaaa;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  text-align: center;
+  padding: 20px;
+  line-height: 1.8;
+}

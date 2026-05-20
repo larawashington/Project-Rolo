@@ -1,0 +1,9 @@
+{
+  "animation": "sleep",
+  "frames": 8,
+  "fps": 4,
+  "loop_type": "ping-pong",
+  "intro_frames": [0, 1],
+  "loop_frames": [2, 3, 4, 5, 6, 7],
+  "source": "Frames 0-1 are anticipation (play once on entry). Frames 2-7 ping-pong for the sustained sleep loop until wake."
+}

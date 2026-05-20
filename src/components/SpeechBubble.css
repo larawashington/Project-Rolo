@@ -1,0 +1,127 @@
+/*
+ * Rolo's speech bubble — pixel-art styled CSS.
+ *
+ * The bubble is rendered in a separate transparent Tauri window.
+ * Only the bubble div itself has a visible background; everything
+ * else is transparent so only the bubble floats on the desktop.
+ *
+ * Typography: Press Start 2P from Google Fonts for authentic pixel feel.
+ * Border: SVG border-image with 9-slice for pixel-art stepped corners.
+ * Tail: box-shadow "pixels" pointing down toward Rolo.
+ */
+
+/* --- Transparent foundation (must match index.html inline styles) --- */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  overflow: hidden;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  overflow: visible;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* --- Bubble container — the clickable area --- */
+
+.speech-bubble-container {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  /* Just enough to fit the tail's 9px box-shadow extent below the bubble. */
+  padding-bottom: 9px;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  image-rendering: pixelated;
+}
+
+/* --- The bubble body --- */
+/*
+ * The border uses a 21x21 SVG (7x7 pixel grid at 3px/unit) via
+ * border-image with 9-slice. Corner regions (6x6) contain the
+ * 2-pixel chamfer steps. Edge regions stretch the 1-pixel border.
+ * The `fill` keyword renders the white center region as the
+ * bubble background, so no separate background is needed.
+ *
+ * Pixel grid (. = transparent, # = black, W = white):
+ *   r0: .  .  #  #  #  .  .
+ *   r1: .  #  W  W  W  #  .
+ *   r2: #  W  W  W  W  W  #
+ *   r3: #  W  W  W  W  W  #
+ *   r4: #  W  W  W  W  W  #
+ *   r5: .  #  W  W  W  #  .
+ *   r6: .  .  #  #  #  .  .
+ */
+
+.speech-bubble {
+  position: relative;
+  color: #000000;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  /* Padding: reduced by 3px vs visual target to compensate for the
+   * 3px inner white fill of the 6px border-image region. */
+  padding: 5px 9px;
+  box-sizing: border-box;
+  min-width: 60px;
+  max-width: 250px;
+  min-height: 24px;
+  max-height: 100px;
+  /* Pixel-art border via 9-slice SVG border-image */
+  border: 6px solid transparent;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='21' height='21' fill='none' shape-rendering='crispEdges'><rect x='6' y='0' width='9' height='3' fill='black'/><rect x='0' y='6' width='3' height='9' fill='black'/><rect x='18' y='6' width='3' height='9' fill='black'/><rect x='6' y='18' width='9' height='3' fill='black'/><rect x='3' y='3' width='3' height='3' fill='black'/><rect x='15' y='3' width='3' height='3' fill='black'/><rect x='3' y='15' width='3' height='3' fill='black'/><rect x='15' y='15' width='3' height='3' fill='black'/><rect x='6' y='3' width='9' height='3' fill='white'/><rect x='3' y='6' width='15' height='9' fill='white'/><rect x='6' y='15' width='9' height='3' fill='white'/></svg>");
+  border-image-slice: 6 fill;
+  border-image-width: 6px;
+  background: none;
+  image-rendering: pixelated;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+/* --- Pixel-art tail (pointing down toward Rolo) ---------------------------
+ *
+ * Geometry comes from the shared `.pixel-tail` class in App.css. We only
+ * override the unit/fill here (3px grid, white fill) — the box-shadow grid
+ * shape is identical to InteractiveBubble's `.bubble-tail`.
+ */
+.speech-tail {
+  --unit: 3px;
+  --fill: #ffffff;
+}
+
+/* --- Flipped state (bubble below Rolo, tail points up) --- */
+
+.speech-bubble-container.flipped {
+  padding-top: 9px;
+  padding-bottom: 0;
+  align-self: flex-start;
+}
+
+.speech-bubble-container.flipped .speech-tail {
+  order: -1;
+  transform: scaleY(-1);
+  margin: 0 auto calc(-1 * var(--unit, 3px)) auto;
+}
+
+/* --- Hidden state --- */
+
+.speech-bubble-container.hidden {
+  display: none;
+}

@@ -1,0 +1,234 @@
+/*
+ * InteractiveBubble — pixel-art styled interactive prompt.
+ *
+ * Positioned inside the 320x320 main window, above Rolo's 128px sprite.
+ * Available vertical space: 320 - 128 = 192px, with 8px breathing room = 184px usable.
+ * Max bubble height: 176px (leaves room for the tail).
+ *
+ * Styling matches the existing ConfirmationBubble/SpeechBubble aesthetic:
+ * - Pixel-art font (Press Start 2P where available, Monaco fallback)
+ * - White background with black pixel border
+ * - pointer-events: auto on interactive elements
+ *
+ * The transparent window's pointer-events hierarchy:
+ *   html/body/#root: none (clicks pass through)
+ *   .ib-container: none (positioning wrapper)
+ *   .ib-bubble: auto (interactive content)
+ */
+
+/* --- Container — positioning above Rolo --- */
+
+.ib-container {
+  position: absolute;
+  bottom: 136px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Subtle entry animation */
+  animation: ib-fade-in 0.15s ease-out;
+}
+
+.rolo-world.top-anchored .ib-container {
+  bottom: auto;
+  top: 136px;
+}
+
+@keyframes ib-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* --- Bubble body --- */
+
+.ib-bubble {
+  pointer-events: auto;
+  position: relative;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  padding: 8px 12px;
+  padding-right: 24px; /* Room for dismiss button */
+  font-family: "Press Start 2P", Monaco, "Courier New", monospace;
+  font-size: 8px;
+  line-height: 1.5;
+  color: #000000;
+  min-width: 160px;
+  max-width: 240px;
+  max-height: 176px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  text-align: center;
+  image-rendering: pixelated;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+/* --- Dismiss X button --- */
+
+.ib-dismiss {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 1;
+  pointer-events: auto;
+  background: none;
+  border: none;
+  font-family: "Press Start 2P", Monaco, "Courier New", monospace;
+  font-size: 7px;
+  color: #999999;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+.ib-dismiss:hover {
+  color: #000000;
+}
+
+/* --- Text element --- */
+
+.ib-text {
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* --- Button column (vertical layout, full-width buttons) --- */
+
+.ib-button-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+/* Shared button base */
+.ib-btn {
+  pointer-events: auto;
+  display: block;
+  width: 100%;
+  font-family: "Press Start 2P", Monaco, "Courier New", monospace;
+  font-size: 8px;
+  font-weight: bold;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  border: 1px solid;
+  box-sizing: border-box;
+  text-transform: uppercase;
+  transition: background-color 0.1s ease;
+}
+
+/* Primary button — green (like Yum) */
+.ib-btn-primary {
+  background: var(--rolo-green);
+  border-color: #2a4a2a;
+  color: #ffffff;
+}
+
+.ib-btn-primary:hover:not(:disabled) {
+  background: var(--rolo-green-hover);
+}
+
+.ib-btn-primary:active:not(:disabled) {
+  background: #4a7a4a;
+}
+
+/* Secondary button — warm amber/orange-yellow. "Just OK" is a neutral-
+ * to-soft-negative answer; the old red-brown read as alarming (Nah-like
+ * rejection). Amber reads as caution/acknowledgement without punishing
+ * the user for a mid mood. Darker outline + white text keeps contrast. */
+.ib-btn-secondary {
+  background: #d48a2c;
+  border-color: #7a4a12;
+  color: #ffffff;
+}
+
+.ib-btn-secondary:hover:not(:disabled) {
+  background: #e6a040;
+}
+
+.ib-btn-secondary:active:not(:disabled) {
+  background: #b87020;
+}
+
+/* Disabled state for buttons after submission */
+.ib-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* --- Text input wrapper --- */
+
+.ib-text-input-wrapper {
+  position: relative;
+  margin-top: 2px;
+}
+
+/* The expandable textarea */
+.ib-text-input {
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 9px;
+  line-height: 1.4;
+  color: #000000;
+  background: #f8f8f8;
+  border: 1px solid #aaaaaa;
+  border-radius: 2px;
+  padding: 4px 6px;
+  padding-bottom: 14px; /* Room for char count */
+  resize: none;
+  overflow: hidden;
+  outline: none;
+  /* Start at 1 line height */
+  min-height: 18px;
+  /* Cap at 2 lines (approx 32px content + padding) */
+  max-height: 46px;
+}
+
+.ib-text-input::placeholder {
+  color: #999999;
+  font-style: italic;
+}
+
+/* Focus glow — visible feedback that Rolo is listening */
+.ib-text-input:focus {
+  border-color: var(--rolo-green);
+  /* 0x40 alpha — keep literal: CSS vars don't concat with alpha hex suffixes. */
+  box-shadow: 0 0 0 1px #5a8a5a40;
+  background: #ffffff;
+}
+
+.ib-text-input:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Character remaining count */
+.ib-char-count {
+  position: absolute;
+  bottom: 3px;
+  right: 6px;
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 7px;
+  color: #bbbbbb;
+  pointer-events: none;
+  line-height: 1;
+}

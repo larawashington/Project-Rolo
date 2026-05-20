@@ -1,0 +1,20 @@
+{"input": "hi", "expected": "speak"}
+{"input": "Hey there", "expected": "speak"}
+{"input": "HELLO Rolo!", "expected": "speak"}
+{"input": "how are you doing today", "expected": "tool:get_mood_state"}
+{"input": "How's it going buddy?", "expected": "tool:get_mood_state"}
+{"input": "remember when we went hiking?", "expected": "tool:search_vault"}
+{"input": "do you know what we did last summer", "expected": "tool:search_vault"}
+{"input": "Last time you said something about my project", "expected": "tool:search_vault"}
+{"input": "what are you doing right now", "expected": "tool:get_pet_state"}
+{"input": "what's up rolo", "expected": "tool:get_pet_state"}
+{"input": "ok", "expected": "speak"}
+{"input": "oh", "expected": "speak"}
+{"input": "tell me a story about dragons", "expected": "unknown"}
+{"input": "the weather is nice today", "expected": "tool:get_weather"}
+{"input": "I just finished a really long meeting", "expected": "unknown"}
+{"input": "sup", "expected": "speak"}
+{"input": "you ok little guy?", "expected": "tool:get_mood_state"}
+{"input": "what's the weather?", "expected": "tool:get_weather"}
+{"input": "is it raining outside?", "expected": "tool:get_weather"}
+{"input": "how hot is it today?", "expected": "tool:get_weather"}

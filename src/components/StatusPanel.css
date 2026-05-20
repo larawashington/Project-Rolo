@@ -1,0 +1,151 @@
+@import "../styles/tokens.css";
+
+/*
+ * Rolo's status panel — pixel-art character sheet.
+ *
+ * Reuses the SpeechBubble border-image pattern. 4 bar rows, each a 10-segment
+ * grid colored green/yellow/red based on value. Header shows derived mood word.
+ *
+ * Bar palette: the green/yellow/red hues come from `--rolo-bar-*` in tokens.css
+ * (shared with Command Center diagnostics dots). `--bar-*` aliases below let
+ * existing rules keep their short names without touching every callsite.
+ */
+
+:root {
+  --bar-green: var(--rolo-bar-green);
+  --bar-yellow: var(--rolo-bar-yellow);
+  --bar-red: var(--rolo-bar-red);
+  --bar-empty: #d8d4c5;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  overflow: hidden;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-panel {
+  font-family: "Press Start 2P", monospace;
+  color: #000000;
+  font-size: 8px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  padding: 9px 11px;
+  box-sizing: border-box;
+  width: 240px;
+  border: 6px solid transparent;
+  border-image-source: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='21' height='21' fill='none' shape-rendering='crispEdges'><rect x='6' y='0' width='9' height='3' fill='black'/><rect x='0' y='6' width='3' height='9' fill='black'/><rect x='18' y='6' width='3' height='9' fill='black'/><rect x='6' y='18' width='9' height='3' fill='black'/><rect x='3' y='3' width='3' height='3' fill='black'/><rect x='15' y='3' width='3' height='3' fill='black'/><rect x='3' y='15' width='3' height='3' fill='black'/><rect x='15' y='15' width='3' height='3' fill='black'/><rect x='6' y='3' width='9' height='3' fill='white'/><rect x='3' y='6' width='15' height='9' fill='white'/><rect x='6' y='15' width='9' height='3' fill='white'/></svg>");
+  border-image-slice: 6 fill;
+  border-image-width: 6px;
+  background: none;
+  image-rendering: pixelated;
+}
+
+.status-header {
+  font-size: 8px;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+}
+
+.mood-word {
+  color: #2d5a8c;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 7px;
+}
+
+.bar-label {
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.bar-track {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 1px;
+  flex-grow: 1;
+  height: 8px;
+  background: #000000;
+  padding: 1px;
+  box-sizing: border-box;
+}
+
+.bar-segment {
+  height: 100%;
+  background: var(--bar-empty);
+  image-rendering: pixelated;
+}
+
+.bar-segment.bar-green {
+  background: var(--bar-green);
+}
+
+.bar-segment.bar-yellow {
+  background: var(--bar-yellow);
+}
+
+.bar-segment.bar-red {
+  background: var(--bar-red);
+}
+
+.bar-segment.bar-empty {
+  background: var(--bar-empty);
+}
+
+/* Tabs — Mood vs Dreams (PRD §O4) */
+.statuspanel-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.statuspanel-tab {
+  font-family: "Press Start 2P", monospace;
+  font-size: 7px;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid #000000;
+  color: #000000;
+  padding: 3px 6px;
+  cursor: pointer;
+  image-rendering: pixelated;
+}
+
+.statuspanel-tab:hover {
+  background: #d8d4c5;
+}
+
+.statuspanel-tab-active {
+  background: #2d5a8c;
+  color: #ffffff;
+  border-color: #2d5a8c;
+}
+
+.statuspanel-tab-active:hover {
+  background: #2d5a8c;
+}

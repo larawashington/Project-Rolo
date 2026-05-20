@@ -1,0 +1,7 @@
+{
+  "animation": "walk_left",
+  "frames": 4,
+  "fps": 8,
+  "loop_type": "forward",
+  "source": "Walk cycle — standard default pace"
+}

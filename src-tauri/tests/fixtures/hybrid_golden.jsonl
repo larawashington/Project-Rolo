@@ -1,0 +1,10 @@
+{"query":"should I be brief?","expected_chunk_id":"user/preferences.md#Communication Style"}
+{"query":"what does my human enjoy eating?","expected_chunk_id":"user/preferences.md#Likes"}
+{"query":"what hours do I work?","expected_chunk_id":"user/routines.md#Work Hours"}
+{"query":"am I a programmer?","expected_chunk_id":"user/identity.md#Known Facts"}
+{"query":"how do I want Rolo to talk to me?","expected_chunk_id":"relationships/human.md#What They Seem to Want From Me"}
+{"query":"food preferences","expected_chunk_id":"user/preferences.md#Likes"}
+{"query":"things that bug me","expected_chunk_id":"user/preferences.md#Dislikes"}
+{"query":"what is the bond like between us?","expected_chunk_id":"relationships/human.md#Tone of Our Relationship"}
+{"query":"keep your replies tight","expected_chunk_id":"user/preferences.md#Communication Style"}
+{"query":"when do I take a breather","expected_chunk_id":"user/routines.md#Break Patterns"}

@@ -1,0 +1,7 @@
+{
+  "animation": "rolo360",
+  "frames": 9,
+  "fps": 8,
+  "loop_type": "forward",
+  "source": "Turn/rotation — standard default pace"
+}

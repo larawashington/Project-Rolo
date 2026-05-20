@@ -1,0 +1,34 @@
+/*
+ * Shared color tokens for Rolo.
+ *
+ * Every window-level CSS file (App.css, StatusPanel.css, CommandCenter
+ * index.css, etc.) @imports this so the same palette is reachable from any
+ * component, in any Tauri webview.
+ *
+ * Naming convention:
+ *   --rolo-*           — Rolo's primary brand palette (greens, action red, text)
+ *   --rolo-bar-*       — StatusPanel bar fills + Command Center diagnostics dots
+ *
+ * If you find yourself reaching for a hex literal in a component CSS file,
+ * promote it here first.
+ */
+
+:root {
+  /* Brand greens */
+  --rolo-green: #5a8a5a;
+  --rolo-green-hover: #6aaa6a;
+
+  /* Destructive action red (Clear Memory, Delete, etc.) */
+  --rolo-red: #b94a4a;
+
+  /* Default body text on light pixel-art surfaces */
+  --rolo-text: #333333;
+
+  /* Diagnostic / status bar palette
+   * Used by StatusPanel's mood bars AND Command Center's perception probe
+   * status dots so a "green" bar in Status reads as the same hue as a
+   * "green" probe dot in Diagnostics. */
+  --rolo-bar-green: #5fb56b;
+  --rolo-bar-yellow: #e1c34d;
+  --rolo-bar-red: #d05c4f;
+}

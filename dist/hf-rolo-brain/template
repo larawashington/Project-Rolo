@@ -1,0 +1,4 @@
+{{- range .Messages }}
+<start_of_turn>{{ if eq .Role "user" }}user{{ else }}model{{ end }}
+{{ .Content }}<end_of_turn>
+{{ end }}<start_of_turn>model

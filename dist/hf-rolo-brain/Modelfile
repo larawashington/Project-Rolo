@@ -1,0 +1,39 @@
+# Modelfile for the rolo-brain Ollama tag (Gemma 3 4B + fused LoRA
+# adapter, quantized to Q5_K_M for distribution).
+#
+# Ollama auto-discovers this file when a user runs
+# `ollama pull hf.co/<user>/rolo-brain`. The FROM path is relative to
+# the HuggingFace repo root.
+#
+# No SYSTEM directive — Rolo's persona is in the weights. Adding a
+# system prompt is off-distribution and will degrade output quality.
+# The model expects all state context folded into the first user
+# turn; see `runtime_contract.md` for the exact prompt layout.
+FROM ./rolo-brain-Q5_K_M.gguf
+
+TEMPLATE """{{- range .Messages }}
+<start_of_turn>{{ if eq .Role "user" }}user{{ else }}model{{ end }}
+{{ .Content }}<end_of_turn>
+{{ end }}<start_of_turn>model
+"""
+
+# Sampling defaults match the configuration used to validate the
+# fine-tune.
+PARAMETER temperature 0.85
+PARAMETER top_p 0.95
+
+# num_predict 64 ≈ 49 words at Gemma's ~1.3 tok/word average —
+# comfortably past the 30-word training target with headroom for
+# stop-token cleanup.
+PARAMETER num_predict 64
+
+# Stop sequences clip structural rambles at the first bullet or list
+# marker. The model is trained to end naturally; these are
+# belt-and-braces.
+PARAMETER stop "<end_of_turn>"
+PARAMETER stop "\n\n"
+PARAMETER stop "\n* "
+PARAMETER stop "\n- "
+PARAMETER stop "\n1. "
+PARAMETER stop "\n2. "
+PARAMETER stop "Monday:"

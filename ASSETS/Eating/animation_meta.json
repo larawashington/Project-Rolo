@@ -1,0 +1,7 @@
+{
+  "animation": "eating",
+  "frames": 13,
+  "fps": 8,
+  "loop_type": "forward",
+  "source": "Eating/chewing — standard default pace"
+}

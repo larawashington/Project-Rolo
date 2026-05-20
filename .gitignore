@@ -1,0 +1,57 @@
+# Python (archive)
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node
+node_modules/
+dist/*
+!dist/hf-rolo-brain/
+dist/hf-rolo-brain/*.gguf
+dist-ssr/
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/schemas/
+*.rs.bk
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.sw?
+
+# Pixel Animator Outputs (generated reference)
+Pixel Animator Outputs/
+
+# Claude Code (keep skills and agents)
+.claude/*
+!.claude/skills/
+!.claude/agents/
+!.claude/commands/
+!.claude/settings.json
+!.claude/settings.local.json.example
+
+# Subagent scratchpad memory (anywhere in the tree)
+**/.claude/agent-memory/
+
+# Stale subagent memory leftover from earlier worktree paths
+desktop_pet/
+
+# Fine-tune artifacts
+.venv-finetune/
+adapters/
+data/finetune/sft-v1/mlx_data/
+data/finetune/external/
+build/
+merged/
+
+# Secrets
+.env
+.env.local
+.env.*.local

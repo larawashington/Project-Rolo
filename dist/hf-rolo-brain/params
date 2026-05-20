@@ -1,0 +1,14 @@
+{
+  "temperature": 0.85,
+  "top_p": 0.95,
+  "num_predict": 64,
+  "stop": [
+    "<end_of_turn>",
+    "\n\n",
+    "\n* ",
+    "\n- ",
+    "\n1. ",
+    "\n2. ",
+    "Monday:"
+  ]
+}

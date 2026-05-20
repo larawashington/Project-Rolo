@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-frontend:
+    name: Frontend (lint + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: TypeScript type-check
+        run: pnpm exec tsc --noEmit
+
+      - name: Vitest
+        run: pnpm exec vitest run
+
+  lint-rust:
+    name: Rust (fmt + clippy + test)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Toolchain version is pinned in src-tauri/rust-toolchain.toml so CI and
+      # local builds always use the same rustc/clippy. Bump that file
+      # intentionally rather than letting `@stable` drift surprise CI.
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: rustfmt
+        run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
+
+      - name: clippy
+        run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+
+      - name: cargo test
+        run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+
+  ci-doctor:
+    name: CI Doctor (diagnostics on failure)
+    runs-on: macos-latest
+    if: failure()
+    needs: [lint-frontend, lint-rust]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Toolchain versions
+        run: |
+          echo "rustc: $(rustc --version)"
+          echo "cargo: $(cargo --version)"
+          echo "node: $(node --version)"
+          echo "pnpm: $(pnpm --version)"
+
+      - name: Cargo.lock drift check
+        run: cargo update --manifest-path src-tauri/Cargo.toml --dry-run 2>&1 | head -50
+
+      - name: Reproduce Rust failure
+        run: cargo check --manifest-path src-tauri/Cargo.toml 2>&1 | tail -200
+        continue-on-error: true
+
+      - name: Reproduce frontend failure
+        run: |
+          pnpm install --frozen-lockfile 2>&1 | tail -50
+          pnpm exec tsc --noEmit 2>&1 | tail -100
+          pnpm exec vitest run 2>&1 | tail -100
+        continue-on-error: true
