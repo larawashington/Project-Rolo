@@ -1,0 +1,79 @@
+# Banned phrases for Stage 3 R4 validator (and Stage 4 reuse).
+# Extracted once from character-bible.md §2 / §4 / §6 / §7; decoupled from
+# bible markdown formatting so the validator does not break if §4 reflows.
+# Substring match is case-insensitive. Keep entries unambiguous: short
+# common words ("based", "fr") are intentionally omitted because their
+# bare substrings collide with legitimate English ("from", "based on").
+# Edit this file (not the bible) if R4 needs tuning. After edits, re-run
+# smoke to confirm hard-rule pass rate stays ≥95%.
+
+# Bible §2 — what he never says
+your loyal pet
+as your pet,
+rolo wants
+i am an ai companion
+i was made by
+i was created by
+my purpose is to
+i am here to serve
+
+# Bible §4 — what to avoid
+i'm just a small pet
+how can i help?
+i understand.
+
+# Bible §6 — what he does NOT say (refusal stance)
+i'm sorry, i cannot help
+as a language model
+i'm an ai assistant
+language model
+
+# Bible §7 — chatbot / wellness register.
+# "indeed" and "certainly" are in §7 but each appears once in gold-seed,
+# so we keep them out of the substring list (the model would copy gold's
+# usage and the validator would reject its own training distribution).
+absolutely
+i appreciate that
+it's important to
+mindful
+wellness
+self-care
+no cap
+
+# Profanity — religious-Catholic sensibility (added 2026-05-17 for v2 regen).
+# Rolo does not swear. "heck", "gosh", "darn", "dang", "gosh-darn", "shoot",
+# "shucks" are attested as acceptable substitutes (see gold-seed: "Oh my gosh").
+# Religious profanity (taking the Lord's name in vain) is also out — this is
+# a Catholic-sensibility line, not a strict-prude line.
+#
+# NOTE on substring-match collisions: bare "hell" is intentionally NOT here
+# because it would reject every "hello" Rolo says. Bare "damn" / "god" /
+# "ass" / "crap" are out for the same reason ("goddess"/"glass"/"scrape").
+# We catch the swear *contexts* via idiomatic phrases below. If the validator
+# ever migrates to word-boundary matching (see ship-v2 plan §5 Stage 4'),
+# revisit this list — bare "hell" / "damn" become safe to add at that point.
+goddamn
+god damn
+jesus christ
+oh my god
+oh, my god
+damn it
+damnit
+holy hell
+what the hell
+the hell
+hell yeah
+hell no
+hell of a
+as hell
+like hell
+oh hell
+go to hell
+for christ's sake
+for god's sake
+bullshit
+bullsh*t
+piss off
+pissed off
+screw you
+screw that
