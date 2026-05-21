@@ -24,7 +24,7 @@ Rolo lives locally on your machine and respects your privacy. He's powered by th
 
 ## Install Rolo (macOS)
 
-Grab the latest signed build — no compiler required:
+Grab the latest build — no compiler required:
 
 **[⬇ Download Project-Rolo.dmg](https://github.com/larawashington/Project-Rolo/releases/latest/download/Project-Rolo.dmg)**
 
@@ -37,6 +37,8 @@ Grab the latest signed build — no compiler required:
    ```
 
 4. Launch Rolo from Applications.
+
+> **First launch on macOS:** the alpha build isn't notarized yet, so Gatekeeper will say *"Apple could not verify Project-Rolo is free of malware."* Right-click Rolo in Applications and choose **Open** the first time — macOS will remember the exception. Notarization is on the roadmap.
 
 > **Fallback:** if `rolo-brain` isn't on your machine, Rolo automatically falls back to base `gemma3:4b` with a system prompt. The fallback works but Rolo sounds less like himself — `rolo-brain` is the recommended path.
 
@@ -56,7 +58,7 @@ ollama pull hf.co/larawashington/rolo-brain
 pnpm tauri dev
 ```
 
-To produce a signed app bundle (output in `src-tauri/target/release/bundle/`):
+To produce an app bundle (output in `src-tauri/target/release/bundle/`):
 
 ```bash
 pnpm tauri build
